@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med-e-Safe</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #2e7d32;
+            --accent-color: #f5f5f5;
+            --error-color: #d32f2f;
+            --warning-color: #ff9800;
+            --success-color: #43a047;
+            --text-primary: #333;
+            --text-secondary: #777;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-primary);
+        }
+
+        .container {
+            background-color: #fff;
+            width: 100%;
+            max-width: 700px;
+            margin: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1565c0 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            opacity: 0.8;
+            font-size: 15px;
+            margin-top: 8px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2 i {
+            margin-right: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 15px;
+            outline: none;
+            background-color: var(--accent-color);
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+            background-color: white;
+        }
+
+        input[type="file"] {
+            background-color: var(--accent-color);
+            padding: 10px;
+            border-radius: var(--border-radius);
+            width: 100%;
+            border: 1px dashed #ddd;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        #uploadButton {
+            background-color: var(--secondary-color);
+        }
+
+        #uploadButton:hover {
+            background-color: #2e7d32;
+        }
+
+        #signOutButton {
+            background-color: #f44336;
+            margin-left: 10px;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-icon {
+            margin-right: 10px;
+        }
+
+        .success { 
+            background-color: rgba(67, 160, 71, 0.1); 
+            color: var(--success-color); 
+            border-left: 4px solid var(--success-color);
+        }
+
+        .error { 
+            background-color: rgba(211, 47, 47, 0.1); 
+            color: var(--error-color); 
+            border-left: 4px solid var(--error-color);
+        }
+
+        pre { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: var(--border-radius); 
+            overflow-x: auto; 
+            border: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .auth-section {
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: rgba(30, 136, 229, 0.1);
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .user-info i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s forwards;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(30, 136, 229, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(30, 136, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(30, 136, 229, 0); }
+        }
+
+        /* Loading spinner */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Upload progress bar */
+        .progress-container {
+            height: 4px;
+            width: 100%;
+            background-color: #f5f5f5;
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            color: var(--text-secondary);
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container animate__animated animate__fadeIn">
+        <div class="header">
+            <div class="logo-container">
+                <i class="fas fa-shield-alt logo"></i>
+                <h1>Med-e-Safe</h1>
+            </div>
+            <div class="subtitle">Secure Hospital Document Management System</div>
+        </div>
+        
+        <div class="content">
+            <div class="card slide-in">
+                <h2><i class="fas fa-database"></i> Database Configuration</h2>
+                
+                <div class="form-group">
+                    <label for="supabaseUrl">Database URL:</label>
+                    <input type="text" id="supabaseUrl" placeholder="https://your-project-id.supabase.co">
+                </div>
+                
+                <div class="form-group">
+                    <label for="supabaseKey">Database API Key:</label>
+                    <input type="text" id="supabaseKey" placeholder="your-supabase-api-key">
+                    <div class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">This key is required to connect to your Supabase database.</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="authSection" class="auth-section card slide-in">
+                <h2><i class="fas fa-user-lock"></i> Authentication</h2>
+                
+                <div id="authControls">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" placeholder="your@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" placeholder="your-password">
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="signInButton"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+                        <button id="signUpButton"><i class="fas fa-user-plus"></i> Sign Up</button>
+                    </div>
+                </div>
+                
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <i class="fas fa-user-circle"></i>
+                    Signed in as: <span id="userEmail" class="fw-bold"></span>
+                    <button id="signOutButton"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                </div>
+            </div>
+            
+            <div id="uploadSection" class="upload-section card">
+                <h2><i class="fas fa-file-upload"></i> File Upload</h2>
+                
+                <div class="form-group">
+                    <label for="bucketName">Folder Name:</label>
+                    <input type="text" id="bucketName" placeholder="your-bucket-name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fileUpload">Select File:</label>
+                    <input type="file" id="fileUpload">
+                </div>
+                
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="uploadButton"><i class="fas fa-upload"></i> Upload File</button>
+                    <button id="viewFilesButton"><i class="fas fa-folder-open"></i> View My Files</button>
+                </div>
+            </div>
+            
+            <div id="responseData" style="display: none; margin-top: 20px;" class="card">
+                <h3><i class="fas fa-code"></i> Response Data:</h3>
+                <pre id="responseJson"></pre>
+            </div>
+            
+            <div id="status" class="status" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let supabaseClient = null;
+            const signInButton = document.getElementById('signInButton');
+            const signUpButton = document.getElementById('signUpButton');
+            const signOutButton = document.getElementById('signOutButton');
+            const uploadButton = document.getElementById('uploadButton');
+            const viewFilesButton = document.getElementById('viewFilesButton');
+            const statusDiv = document.getElementById('status');
+            const responseDataDiv = document.getElementById('responseData');
+            const responseJsonPre = document.getElementById('responseJson');
+            const authSection = document.getElementById('authSection');
+            const uploadSection = document.getElementById('uploadSection');
+            const authControls = document.getElementById('authControls');
+            const userInfo = document.getElementById('userInfo');
+            const userEmailSpan = document.getElementById('userEmail');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            
+            // Initialize Supabase client when URL and key are entered
+            function initSupabase() {
+                const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+                const supabaseKey = document.getElementById('supabaseKey').value.trim();
+                
+                if (!supabaseUrl || !supabaseKey) {
+                    showStatus('Please enter Supabase URL and API Key.', 'error');
+                    return null;
+                }
+                
+                try {
+                    if (typeof supabase === 'undefined') {
+                        showStatus('Supabase client not loaded. Please check your internet connection.', 'error');
+                        return null;
+                    }
+                    
+                    return supabase.createClient(supabaseUrl, supabaseKey);
+                } catch (error) {
+                    showStatus(`Error initializing Supabase: ${error.message || error}`, 'error');
+                    return null;
+                }
+            }
+            
+            // Check if user is already authenticated
+            function checkAuth() {
+                if (!supabaseClient) {
+                    supabaseClient = initSupabase();
+                    if (!supabaseClient) return;
+                }
+                
+                const user = supabaseClient.auth.getUser().then(({ data }) => {
+                    if (data?.user) {
+                        // User is authenticated
+                        userEmailSpan.textContent = data.user.email;
+                        authControls.style.display = 'none';
+                        userInfo.style.display = 'flex';
+                        uploadSection.style.display = 'block';
+                        // Add animation to upload section
+                        uploadSection.classList.add('fade-in');
+                    } else {
+                        // User is not authenticated
+                        authControls.style.display = 'block';
+                        userInfo.style.display = 'none';
+                        uploadSection.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Add loading state to buttons
+            function setButtonLoading(button, isLoading, text) {
+                if (isLoading) {
+                    button.disabled = true;
+                    const originalText = button.innerHTML;
+                    button.setAttribute('data-original-text', originalText);
+                    button.innerHTML = `<span class="loader"></span>${text || 'Processing...'}`;
+                } else {
+                    button.disabled = false;
+                    const originalText = button.getAttribute('data-original-text');
+                    if (originalText) {
+                        button.innerHTML = originalText;
+                    }
+                }
+            }
+            
+            // Event listeners for auth buttons
+            signInButton.addEventListener('click', async function() {
+                if (!supabaseClient) {
+                    supabaseClient = initSupabase();
+                    if (!supabaseClient) return;
+                }
+                
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value.trim();
+                
+                if (!email || !password) {
+                    showStatus('Please enter both email and password.', 'error');
+                    return;
+                }
+                
+                try {
+                    setButtonLoading(signInButton, true, 'Signing in...');
+                    showStatus('Signing in...', '');
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+                    
+                    if (error) throw error;
+                    
+                    showStatus('Signed in successfully!', 'success');
+                    checkAuth();
+                } catch (error) {
+                    console.error('Error signing in:', error);
+                    showStatus(`Error signing in: ${error.message || error}`, 'error');
+                } finally {
+                    setButtonLoading(signInButton, false);
+                }
+            });
+            
+            signUpButton.addEventListener('click', async function() {
+                if (!supabaseClient) {
+                    supabaseClient = initSupabase();
+                    if (!supabaseClient) return;
+                }
+                
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value.trim();
+                
+                if (!email || !password) {
+                    showStatus('Please enter both email and password.', 'error');
+                    return;
+                }
+                
+                try {
+                    setButtonLoading(signUpButton, true, 'Signing up...');
+                    showStatus('Signing up...', '');
+                    const { data, error } = await supabaseClient.auth.signUp({
+                        email,
+                        password
+                    });
+                    
+                    if (error) throw error;
+                    
+                    if (data.user && data.session) {
+                        showStatus('Signed up and logged in successfully!', 'success');
+                        checkAuth();
+                    } else {
+                        showStatus('Signed up successfully! Please check your email for confirmation.', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error signing up:', error);
+                    showStatus(`Error signing up: ${error.message || error}`, 'error');
+                } finally {
+                    setButtonLoading(signUpButton, false);
+                }
+            });
+            
+            signOutButton.addEventListener('click', async function() {
+                if (!supabaseClient) return;
+                
+                try {
+                    setButtonLoading(signOutButton, true, 'Signing out...');
+                    showStatus('Signing out...', '');
+                    const { error } = await supabaseClient.auth.signOut();
+                    
+                    if (error) throw error;
+                    
+                    showStatus('Signed out successfully!', 'success');
+                    checkAuth();
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                    showStatus(`Error signing out: ${error.message || error}`, 'error');
+                } finally {
+                    setButtonLoading(signOutButton, false);
+                }
+            });
+            
+            // Simulate upload progress
+            function simulateUploadProgress() {
+                let progress = 0;
+                progressContainer.style.display = 'block';
+                progressBar.style.width = '0%';
+                
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress > 90) {
+                        clearInterval(interval);
+                        progress = 90; // Wait for the actual completion
+                    }
+                    progressBar.style.width = `${progress}%`;
+                }, 300);
+                
+                return {
+                    complete: function() {
+                        clearInterval(interval);
+                        progressBar.style.width = '100%';
+                        setTimeout(() => {
+                            progressContainer.style.display = 'none';
+                        }, 1000);
+                    },
+                    reset: function() {
+                        clearInterval(interval);
+                        progressContainer.style.display = 'none';
+                        progressBar.style.width = '0%';
+                    }
+                };
+            }
+            
+            // File upload handler
+            uploadButton.addEventListener('click', async function() {
+                if (!supabaseClient) {
+                    supabaseClient = initSupabase();
+                    if (!supabaseClient) return;
+                }
+                
+                // Check if user is authenticated
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) {
+                    showStatus('You must be signed in to upload files.', 'error');
+                    uploadSection.style.display = 'none';
+                    return;
+                }
+                
+                const bucketName = document.getElementById('bucketName').value.trim();
+                const fileInput = document.getElementById('fileUpload');
+                
+                if (!bucketName) {
+                    showStatus('Please enter a folder name.', 'error');
+                    return;
+                }
+                
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    showStatus('Please select a file to upload.', 'error');
+                    return;
+                }
+                
+                const file = fileInput.files[0];
+                
+                try {
+                    setButtonLoading(uploadButton, true, 'Uploading...');
+                    showStatus('Uploading file...', '');
+                    
+                    // Start progress animation
+                    const progress = simulateUploadProgress();
+                    
+                    // Simple path with timestamp and user ID to avoid collisions
+                    const filePath = `public/${user.id}/${Date.now()}_${file.name}`;
+                    
+                    // Upload file
+                    const result = await supabaseClient.storage
+                        .from(bucketName)
+                        .upload(filePath, file, {
+                            cacheControl: '3600',
+                            upsert: true
+                        });
+                    
+                    console.log("Upload response:", result);
+                    
+                    // Complete progress animation
+                    progress.complete();
+                    
+                    // Display the complete response for debugging
+                    responseJsonPre.textContent = JSON.stringify(result, null, 2);
+                    responseDataDiv.style.display = 'block';
+                    responseDataDiv.classList.add('slide-in');
+                    
+                    if (result.error) {
+                        progress.reset();
+                        throw result.error;
+                    }
+                    
+                    // Display success with file path
+                    const { data: urlData } = supabaseClient.storage
+                        .from(bucketName)
+                        .getPublicUrl(filePath);
+                    
+                    showStatus(`File uploaded successfully! Path: ${filePath}\nPublic URL: ${urlData.publicUrl}`, 'success');
+                    
+                    // Save the bucket name for later use
+                    localStorage.setItem('bucketName', bucketName);
+                    
+                    // Notify other tabs that a file was uploaded
+                    localStorage.setItem('fileUploaded', Date.now().toString());
+                    
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                    responseJsonPre.textContent = JSON.stringify(error, null, 2);
+                    responseDataDiv.style.display = 'block';
+                    responseDataDiv.classList.add('slide-in');
+                    showStatus(`Error uploading file: ${error.message || error}`, 'error');
+                } finally {
+                    setButtonLoading(uploadButton, false);
+                }
+            });
+            
+            // View files button
+            viewFilesButton.addEventListener('click', function() {
+                const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+                const supabaseKey = document.getElementById('supabaseKey').value.trim();
+                const bucketName = document.getElementById('bucketName').value.trim();
+                
+                // Save credentials for the file viewer page
+                if (supabaseUrl) localStorage.setItem('supabaseUrl', supabaseUrl);
+                if (supabaseKey) localStorage.setItem('supabaseKey', supabaseKey);
+                if (bucketName) localStorage.setItem('bucketName', bucketName);
+                
+                setButtonLoading(viewFilesButton, true, 'Loading files...');
+                
+                // Redirect to file viewer with refresh parameter
+                setTimeout(() => {
+                    window.location.href = 'file-viewer.html?refresh=true';
+                }, 500);
+            });
+            
+            // Input animations
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('pulse');
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('pulse');
+                });
+            });
+            
+            // Initialize Supabase client when URL or API key changes
+            document.getElementById('supabaseUrl').addEventListener('change', function() {
+                supabaseClient = null;
+                localStorage.setItem('supabaseUrl', this.value.trim());
+                checkAuth();
+            });
+            
+            document.getElementById('supabaseKey').addEventListener('change', function() {
+                supabaseClient = null;
+                localStorage.setItem('supabaseKey', this.value.trim());
+                checkAuth();
+            });
+            
+            document.getElementById('bucketName').addEventListener('change', function() {
+                localStorage.setItem('bucketName', this.value.trim());
+            });
+            
+            // Helper function to show status messages
+            function showStatus(message, type) {
+                statusDiv.innerHTML = type === 'success' 
+                    ? `<i class="fas fa-check-circle status-icon"></i>${message}`
+                    : type === 'error'
+                    ? `<i class="fas fa-exclamation-circle status-icon"></i>${message}`
+                    : message;
+                
+                statusDiv.style.display = 'block';
+                statusDiv.classList.remove('success', 'error', 'slide-in');
+                void statusDiv.offsetWidth; // Trigger reflow for animation to work
+                statusDiv.classList.add('slide-in');
+                
+                if (type) {
+                    statusDiv.classList.add(type);
+                }
+            }
+            
+            // Check authentication status on page load
+            // Try to load saved credentials
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            const savedKey = localStorage.getItem('supabaseKey');
+            const savedBucket = localStorage.getItem('bucketName');
+            
+            if (savedUrl && savedKey) {
+                document.getElementById('supabaseUrl').value = savedUrl;
+                document.getElementById('supabaseKey').value = savedKey;
+                if (savedBucket) {
+                    document.getElementById('bucketName').value = savedBucket;
+                }
+                
+                // Auto initialize
+                supabaseClient = initSupabase();
+                if (supabaseClient) {
+                    checkAuth();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

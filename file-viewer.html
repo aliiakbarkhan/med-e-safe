@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med-E-Safe File Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary: #2c6db0;
+            --primary-dark: #1c5998;
+            --secondary: #29b6f6;
+            --accent: #0288d1;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #03a9f4;
+            --light: #f5f5f5;
+            --dark: #263238;
+            --text: #37474f;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: var(--primary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .logo i {
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.2);
+            border-left: 4px solid white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--light);
+            padding: 6px 12px;
+            border-radius: 30px;
+        }
+
+        .user-info i {
+            color: var(--primary);
+        }
+
+        .content-area {
+            padding: 30px;
+            flex: 1;
+            overflow: auto;
+            background-color: #f0f4f8;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .connect-section {
+            padding: 25px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .form-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 109, 176, 0.2);
+            outline: none;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #d5d5d5;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #43a047;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53935;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #0298db;
+            transform: translateY(-2px);
+        }
+
+        .user-info-card {
+            background: #f8fdff;
+            border-left: 4px solid var(--info);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .user-email {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-email i {
+            color: var(--info);
+        }
+
+        .files-section {
+            padding: 25px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9e9e9e;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 109, 176, 0.2);
+            outline: none;
+        }
+
+        .file-list {
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eaeaea;
+            transition: var(--transition);
+        }
+
+        .file-item:hover {
+            background: #f9fafb;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .file-date {
+            font-size: 13px;
+            color: #757575;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .view-btn {
+            background: #e3f2fd;
+            color: var(--info);
+        }
+
+        .view-btn:hover {
+            background: var(--info);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .delete-btn {
+            background: #ffebee;
+            color: var(--danger);
+        }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .empty-list {
+            padding: 30px;
+            text-align: center;
+            color: #757575;
+        }
+
+        .empty-list i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #bdbdbd;
+        }
+
+        .empty-message {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .empty-submessage {
+            font-size: 14px;
+            color: #9e9e9e;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            color: #757575;
+        }
+
+        .loading i {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: var(--primary);
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+            gap: 5px;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #f5f5f5;
+            border-color: #bdbdbd;
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status i {
+            font-size: 18px;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+
+        .status-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+
+        .status-info {
+            background: #e3f2fd;
+            color: #0d47a1;
+            border-left: 4px solid #2196f3;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        .slide-up {
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+            .sidebar-header {
+                padding: 0 0 15px;
+                margin-bottom: 15px;
+            }
+            .sidebar-nav {
+                display: flex;
+                overflow-x: auto;
+            }
+            .nav-item {
+                padding: 10px 15px;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 15px;
+            }
+            .actions {
+                flex-direction: column;
+            }
+            .filter-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-clinic-medical"></i>
+                    <span class="logo-text">Med-E-Safe</span>
+                </div>
+                <div class="sidebar-subtitle">Secure Medical Records System</div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-item active">
+                    <i class="fas fa-file-medical"></i>
+                    <span>File Management</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload Documents</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-user-md"></i>
+                    <span>User Management</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div class="page-title">Medical Records Management</div>
+                <div class="user-section">
+                    <div class="user-info" id="userInfoBar" style="display: none;">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userEmailDisplay"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="container">
+                    <div class="connect-section slide-up">
+                        <h2 class="form-title"><i class="fas fa-link"></i> Connect to Storage</h2>
+                        
+                        <div class="form-group">
+                            <label for="supabaseUrl"><i class="fas fa-server"></i> Database URL:</label>
+                            <input type="text" id="supabaseUrl" class="form-control" placeholder="https://your-project-id.supabase.co">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="supabaseKey"><i class="fas fa-key"></i> Database API Key:</label>
+                            <input type="text" id="supabaseKey" class="form-control" placeholder="your-supabase-api-key">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bucketName"><i class="fas fa-database"></i> Folder Name:</label>
+                            <input type="text" id="bucketName" class="form-control" placeholder="your-bucket-name">
+                        </div>
+                        
+                        <div class="actions">
+                            <button id="connectButton" class="btn btn-primary">
+                                <i class="fas fa-plug"></i> Connect
+                            </button>
+                            <button id="uploadPageButton" class="btn btn-secondary">
+                                <i class="fas fa-upload"></i> Go to Upload Page
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="userInfo" class="user-info-card fade-in" style="display: none;">
+                        <div class="user-email">
+                            <i class="fas fa-user-md"></i>
+                            <span>Signed in as: <strong id="userEmail"></strong></span>
+                        </div>
+                        <button id="signOutButton" class="btn btn-danger">
+                            <i class="fas fa-sign-out-alt"></i> Sign Out
+                        </button>
+                    </div>
+                    
+                    <div id="fileSection" class="files-section slide-up" style="display: none;">
+                        <div class="section-header">
+                            <h2 class="section-title"><i class="fas fa-file-medical-alt"></i> Medical Records</h2>
+                        </div>
+                        
+                        <div class="filter-bar">
+                            <div class="search-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="fileSearch" class="search-input" placeholder="Search files...">
+                            </div>
+                            <button id="refreshButton" class="btn btn-info">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                        
+                        <div id="fileList" class="file-list">
+                            <div class="loading">
+                                <i class="fas fa-spinner"></i>
+                                <span>Loading medical records...</span>
+                            </div>
+                        </div>
+                        
+                        <div id="pagination" class="pagination"></div>
+                    </div>
+                    
+                    <div id="status" class="status" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let supabaseClient = null;
+            let currentUser = null;
+            const connectButton = document.getElementById('connectButton');
+            const uploadPageButton = document.getElementById('uploadPageButton');
+            const signOutButton = document.getElementById('signOutButton');
+            const refreshButton = document.getElementById('refreshButton');
+            const statusDiv = document.getElementById('status');
+            const userInfo = document.getElementById('userInfo');
+            const userInfoBar = document.getElementById('userInfoBar');
+            const userEmailSpan = document.getElementById('userEmail');
+            const userEmailDisplay = document.getElementById('userEmailDisplay');
+            const fileSection = document.getElementById('fileSection');
+            const fileList = document.getElementById('fileList');
+            const fileSearch = document.getElementById('fileSearch');
+            const pagination = document.getElementById('pagination');
+            
+            // Configuration
+            const filesPerPage = 10;
+            let currentPage = 1;
+            let totalFiles = 0;
+            
+            // Initialize Supabase client
+            function initSupabase() {
+                const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+                const supabaseKey = document.getElementById('supabaseKey').value.trim();
+                
+                if (!supabaseUrl || !supabaseKey) {
+                    showStatus('Please enter Supabase URL and API Key.', 'error');
+                    return null;
+                }
+                
+                try {
+                    if (typeof supabase === 'undefined') {
+                        showStatus('Supabase client not loaded. Please check your internet connection.', 'error');
+                        return null;
+                    }
+                    
+                    return supabase.createClient(supabaseUrl, supabaseKey);
+                } catch (error) {
+                    showStatus(`Error initializing Supabase: ${error.message || error}`, 'error');
+                    return null;
+                }
+            }
+            
+            // Connect to Supabase
+            connectButton.addEventListener('click', function() {
+                // Add pulse animation
+                this.classList.add('pulse');
+                setTimeout(() => {
+                    this.classList.remove('pulse');
+                }, 1000);
+                
+                supabaseClient = initSupabase();
+                if (!supabaseClient) return;
+                
+                checkAuth();
+            });
+            
+            // Check if user is authenticated
+            async function checkAuth() {
+                if (!supabaseClient) return;
+                
+                try {
+                    const { data, error } = await supabaseClient.auth.getUser();
+                    
+                    if (error) throw error;
+                    
+                    if (data?.user) {
+                        // User is authenticated
+                        currentUser = data.user;
+                        userEmailSpan.textContent = data.user.email;
+                        userEmailDisplay.textContent = data.user.email;
+                        userInfo.style.display = 'flex';
+                        userInfoBar.style.display = 'flex';
+                        fileSection.style.display = 'block';
+                        
+                        // Add animation
+                        fileSection.classList.add('slide-up');
+                        setTimeout(() => {
+                            fileSection.classList.remove('slide-up');
+                        }, 500);
+                        
+                        // Fetch files
+                        fetchFiles();
+                    } else {
+                        // User is not authenticated
+                        showStatus('You must be signed in to view files. Please use the Upload Page to sign in.', 'error');
+                        userInfo.style.display = 'none';
+                        userInfoBar.style.display = 'none';
+                        fileSection.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error checking auth:', error);
+                    showStatus(`Error: ${error.message || error}`, 'error');
+                }
+            }
+            
+            // Sign out
+            signOutButton.addEventListener('click', async function() {
+                if (!supabaseClient) return;
+                
+                // Add animation
+                this.classList.add('pulse');
+                
+                try {
+                    const { error } = await supabaseClient.auth.signOut();
+                    
+                    if (error) throw error;
+                    
+                    showStatus('Signed out successfully!', 'success');
+                    userInfo.style.display = 'none';
+                    userInfoBar.style.display = 'none';
+                    fileSection.style.display = 'none';
+                    currentUser = null;
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                    showStatus(`Error signing out: ${error.message || error}`, 'error');
+                } finally {
+                    this.classList.remove('pulse');
+                }
+            });
+            
+            // Go to upload page
+            uploadPageButton.addEventListener('click', function() {
+                // Add animation
+                this.classList.add('pulse');
+                setTimeout(() => {
+                    window.location.href = 'supa.html';
+                }, 300);
+            });
+            
+            // Fetch files from bucket
+            async function fetchFiles(searchTerm = '') {
+                if (!supabaseClient || !currentUser) return;
+                
+                const bucketName = document.getElementById('bucketName').value.trim();
+                
+                if (!bucketName) {
+                    showStatus('Please enter a bucket name.', 'error');
+                    return;
+                }
+                
+                fileList.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <span>Loading medical records...</span>
+                    </div>
+                `;
+                
+                try {
+                    // Construct the path to look for the current user's files
+                    const path = `public/${currentUser.id}/`;
+                    
+                    // List files
+                    const { data, error } = await supabaseClient.storage
+                        .from(bucketName)
+                        .list(path, {
+                            limit: 100,
+                            offset: 0,
+                            sortBy: { column: 'name', order: 'desc' }
+                        });
+                    
+                    if (error) throw error;
+                    
+                    // Filter files if search term is provided
+                    let filteredFiles = data;
+                    if (searchTerm) {
+                        const term = searchTerm.toLowerCase();
+                        filteredFiles = data.filter(file => file.name.toLowerCase().includes(term));
+                    }
+                    
+                    totalFiles = filteredFiles.length;
+                    
+                    // Calculate pagination
+                    const totalPages = Math.ceil(totalFiles / filesPerPage);
+                    if (currentPage > totalPages && totalPages > 0) {
+                        currentPage = totalPages;
+                    }
+                    
+                    // Paginate files
+                    const start = (currentPage - 1) * filesPerPage;
+                    const end = start + filesPerPage;
+                    const paginatedFiles = filteredFiles.slice(start, end);
+                    
+                    // Display files
+                    displayFiles(paginatedFiles, bucketName, path);
+                    
+                    // Update pagination
+                    updatePagination(totalPages);
+                    
+                } catch (error) {
+                    console.error('Error fetching files:', error);
+                    fileList.innerHTML = `
+                        <div class="empty-list">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div class="empty-message">Error fetching files</div>
+                            <div class="empty-submessage">${error.message || error}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Display files in the list
+            function displayFiles(files, bucketName, basePath) {
+                if (!files || files.length === 0) {
+                    fileList.innerHTML = `
+                        <div class="empty-list">
+                            <i class="fas fa-folder-open"></i>
+                            <div class="empty-message">No medical records found</div>
+                            <div class="empty-submessage">Upload new files from the Upload Page</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                fileList.innerHTML = '';
+                
+                files.forEach((file, index) => {
+                    // Add delay for staggered animation
+                    setTimeout(() => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item fade-in';
+                        
+                        // Extract timestamp from filename if present
+                        const filenameMatch = file.name.match(/^(\d+)_(.+)$/);
+                        const timestamp = filenameMatch ? filenameMatch[1] : null;
+                        const originalName = filenameMatch ? filenameMatch[2] : file.name;
+                        
+                        // Create date string if timestamp exists
+                        let dateString = '';
+                        if (timestamp) {
+                            const fileDate = new Date(parseInt(timestamp));
+                            dateString = fileDate.toLocaleString();
+                        }
+                        
+                        // Determine file type icon
+                        let fileIcon = 'fa-file-medical';
+                        if (originalName.endsWith('.pdf')) fileIcon = 'fa-file-pdf';
+                        else if (originalName.endsWith('.jpg') || originalName.endsWith('.png')) fileIcon = 'fa-file-image';
+                        else if (originalName.endsWith('.doc') || originalName.endsWith('.docx')) fileIcon = 'fa-file-word';
+                        else if (originalName.endsWith('.xls') || originalName.endsWith('.xlsx')) fileIcon = 'fa-file-excel';
+                        
+                        // File path
+                        const filePath = `${basePath}${file.name}`;
+                        
+                        // Get public URL
+                        const { data } = supabaseClient.storage
+                            .from(bucketName)
+                            .getPublicUrl(filePath);
+                        
+                        fileItem.innerHTML = `
+                            <div class="file-icon">
+                                <i class="fas ${fileIcon}"></i>
+                            </div>
+                            <div class="file-details">
+                                <div class="file-name">${originalName}</div>
+                                ${timestamp ? `<div class="file-date"><i class="far fa-clock"></i> ${dateString}</div>` : ''}
+                            </div>
+                            <div class="file-actions">
+                                <button class="action-btn view-btn" data-url="${data.publicUrl}" title="View File">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="action-btn delete-btn" data-path="${filePath}" title="Delete File">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        `;
+                        
+                        fileList.appendChild(fileItem);
+                        
+                        // Add event listeners
+                        const viewBtn = fileItem.querySelector('.view-btn');
+                        const deleteBtn = fileItem.querySelector('.delete-btn');
+                        
+                        viewBtn.addEventListener('click', function() {
+                            window.open(this.getAttribute('data-url'), '_blank');
+                        });
+                        
+                        deleteBtn.addEventListener('click', function() {
+                            const path = this.getAttribute('data-path');
+                            deleteFile(path, bucketName);
+                        });
+                        
+                    }, index * 50); // Staggered animation delay
+                });
+            }
+            
+            // Delete file
+            async function deleteFile(path, bucketName) {
+                if (!supabaseClient || !confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+                    return;
+                }
+                
+                try {
+                    const { error } = await supabaseClient.storage
+                        .from(bucketName)
+                        .remove([path]);
+                    
+                    if (error) throw error;
+                    
+                    showStatus('File deleted successfully!', 'success');
+                    fetchFiles(fileSearch.value);
+                } catch (error) {
+                    console.error('Error deleting file:', error);
+                    showStatus(`Error deleting file: ${error.message || error}`, 'error');
+                }
+            }
+            
+            // Refresh files
+            refreshButton.addEventListener('click', function() {
+                // Add animation
+                this.classList.add('animate__animated', 'animate__rotateIn');
+                setTimeout(() => {
+                    this.classList.remove('animate__animated', 'animate__rotateIn');
+                }, 1000);
+                
+                fetchFiles(fileSearch.value);
+            });
+            
+            // Search files
+            fileSearch.addEventListener('input', function() {
+                currentPage = 1; // Reset to first page when searching
+                fetchFiles(this.value);
+            });
+            
+            // Show status message
+            function showStatus(message, type) {
+                statusDiv.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${message}`;
+                statusDiv.className = `status status-${type}`;
+                statusDiv.style.display = 'flex';
+                
+                // Hide status after 5 seconds
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+            
+            // Update pagination
+            function updatePagination(totalPages) {
+                pagination.innerHTML = '';
+                
+                if (totalPages <= 1) {
+                    return;
+                }
+                
+                // Prev button
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'page-btn';
+                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        fetchFiles(fileSearch.value);
+                    }
+                });
+                pagination.appendChild(prevBtn);
+                
+                // Page buttons
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = i;
+                    pageBtn.addEventListener('click', () => {
+                        currentPage = i;
+                        fetchFiles(fileSearch.value);
+                    });
+                    pagination.appendChild(pageBtn);
+                }
+                
+                // Next button
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'page-btn';
+                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        fetchFiles(fileSearch.value);
+                    }
+                });
+                pagination.appendChild(nextBtn);
+            }
+            
+            // Check for stored credentials
+            const storedUrl = localStorage.getItem('supabaseUrl');
+            const storedKey = localStorage.getItem('supabaseKey');
+            const storedBucket = localStorage.getItem('bucketName');
+            
+            if (storedUrl && storedKey && storedBucket) {
+                document.getElementById('supabaseUrl').value = storedUrl;
+                document.getElementById('supabaseKey').value = storedKey;
+                document.getElementById('bucketName').value = storedBucket;
+                
+                // Auto-connect if credentials are stored
+                connectButton.click();
+            }
+            
+            // Store credentials on connect
+            connectButton.addEventListener('click', function() {
+                const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+                const supabaseKey = document.getElementById('supabaseKey').value.trim();
+                const bucketName = document.getElementById('bucketName').value.trim();
+                
+                if (supabaseUrl && supabaseKey && bucketName) {
+                    localStorage.setItem('supabaseUrl', supabaseUrl);
+                    localStorage.setItem('supabaseKey', supabaseKey);
+                    localStorage.setItem('bucketName', bucketName);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Authentication</title>
+    <!-- Import Supabase JS from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 2px solid #ddd;
+        }
+        .tab.active {
+            border-bottom: 2px solid #4285f4;
+            color: #4285f4;
+            font-weight: bold;
+        }
+        .form-container {
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #3367d6;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .success-message {
+            color: green;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Medical Portal</h1>
+        
+        <div class="tabs">
+            <div class="tab active" id="signin-tab">Sign In</div>
+            <div class="tab" id="signup-tab">Sign Up</div>
+        </div>
+        
+        <div id="signin" class="form-container">
+            <div class="form-group">
+                <label for="signin-email">Email</label>
+                <input type="email" id="signin-email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="signin-password">Password</label>
+                <input type="password" id="signin-password" placeholder="Enter your password">
+            </div>
+            <div class="form-group">
+                <label for="signin-role">I am a</label>
+                <select id="signin-role">
+                    <option value="patient">Patient</option>
+                    <option value="doctor">Doctor</option>
+                </select>
+            </div>
+            <button id="signin-button">Sign In</button>
+            <div id="signin-message" class="error-message"></div>
+        </div>
+        
+        <div id="signup" class="form-container" style="display: none;">
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="Enter your password">
+            </div>
+            <div class="form-group">
+                <label for="signup-role">I am a</label>
+                <select id="signup-role">
+                    <option value="patient">Patient</option>
+                    <option value="doctor">Doctor</option>
+                </select>
+            </div>
+            <button id="signup-button">Sign Up</button>
+            <div id="signup-message" class="error-message"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase client immediately
+        const supabaseUrl = 'https://dasbfurobvglciwqetyx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhc2JmdXJvYnZnbGNpd3FldHl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE4NjI0NDUsImV4cCI6MjA1NzQzODQ0NX0.ESMHA5GCIRhF1Y8SSnmuXQ2bD1-A9g_i1K-Jo6p82Kw';
+        
+        // Wait for the page to fully load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create the Supabase client
+            const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+            console.log('Supabase client initialized:', supabase);
+            
+            // Tab switching functionality
+            const signinTab = document.getElementById('signin-tab');
+            const signupTab = document.getElementById('signup-tab');
+            const signinForm = document.getElementById('signin');
+            const signupForm = document.getElementById('signup');
+            
+            signinTab.addEventListener('click', function() {
+                signinTab.classList.add('active');
+                signupTab.classList.remove('active');
+                signinForm.style.display = 'block';
+                signupForm.style.display = 'none';
+            });
+            
+            signupTab.addEventListener('click', function() {
+                signupTab.classList.add('active');
+                signinTab.classList.remove('active');
+                signupForm.style.display = 'block';
+                signinForm.style.display = 'none';
+            });
+            
+// Sign In functionality
+document.getElementById('signin-button').addEventListener('click', async function() {
+    const email = document.getElementById('signin-email').value;
+    const password = document.getElementById('signin-password').value;
+    const role = document.getElementById('signin-role').value;
+    const messageElement = document.getElementById('signin-message');
+    
+    if (!email || !password) {
+        messageElement.textContent = 'Please fill in all fields';
+        return;
+    }
+    
+    try {
+        messageElement.textContent = 'Signing in...';
+        
+        // Sign in with Supabase
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+        
+        if (error) throw error;
+        
+        // Store user role in localStorage
+        localStorage.setItem('userRole', role);
+        
+        messageElement.textContent = 'Sign in successful!';
+        messageElement.classList.remove('error-message');
+        messageElement.classList.add('success-message');
+        
+        // Redirect based on user role
+        setTimeout(() => {
+            if (role === 'doctor') {
+                window.location.href = 'doctor.html';
+            } else {
+                window.location.href = 'supa.html';
+            }
+        }, 1000);
+        
+    } catch (error) {
+        messageElement.textContent = error.message || 'An error occurred during sign in';
+        messageElement.classList.add('error-message');
+        messageElement.classList.remove('success-message');
+    }
+});
+            
+            // Sign Up functionality
+            document.getElementById('signup-button').addEventListener('click', async function() {
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const role = document.getElementById('signup-role').value;
+                const messageElement = document.getElementById('signup-message');
+                
+                if (!email || !password) {
+                    messageElement.textContent = 'Please fill in all fields';
+                    return;
+                }
+                
+                try {
+                    messageElement.textContent = 'Creating account...';
+                    
+                    // Sign up with Supabase
+                    const { data, error } = await supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            data: {
+                                role: role
+                            }
+                        }
+                    });
+                    
+                    if (error) throw error;
+                    
+                    messageElement.textContent = 'Account created! Please verify your email.';
+                    messageElement.classList.remove('error-message');
+                    messageElement.classList.add('success-message');
+                    
+                    // Clear form
+                    document.getElementById('signup-email').value = '';
+                    document.getElementById('signup-password').value = '';
+                    
+                } catch (error) {
+                    messageElement.textContent = error.message || 'An error occurred during sign up';
+                    messageElement.classList.add('error-message');
+                    messageElement.classList.remove('success-message');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
