@@ -1,5 +1,7 @@
 # Med-E-Safe
 
+<img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/12cbe8a4-f55c-4b40-85bb-d8e1405e7b84/dgf7bs9-91a4de96-bb76-4a9c-8893-f8bb759fc027.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzEyY2JlOGE0LWY1NWMtNGI0MC04NWJiLWQ4ZTE0MDVlN2I4NFwvZGdmN2JzOS05MWE0ZGU5Ni1iYjc2LTRhOWMtODg5My1mOGJiNzU5ZmMwMjcuZ2lmIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.6eP1xsyPRLor7OWLZwpelEwK2qLxCYAX0bjozXJL9OM" />
+
 ## Overview
 Med-E-Safe is a secure and efficient web-based medical record management system designed to protect patient data while providing seamless access to medical reports. Built with **HTML, CSS, JavaScript**, and **Supabase** for backend storage and authentication, this platform enables patients to manage their reports and doctors to access necessary medical records securely.
 
