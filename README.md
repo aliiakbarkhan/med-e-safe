@@ -45,19 +45,28 @@ Med-E-Safe/
 
 ## Screenshots
 ### 1. Landing Page (`index.html`)
-![Landing Page](path/to/landing-page-screenshot.png)
+
+![Screenshot 2025-03-14 203935](https://github.com/user-attachments/assets/5a324388-74da-4b19-9c59-aa4f671daecb)
+
 
 ### 2. Patient Dashboard (`file-viewer.html`)
-![Patient Dashboard](path/to/patient-dashboard-screenshot.png)
+
+![Screenshot 2025-03-14 204025](https://github.com/user-attachments/assets/3731aac0-ea02-4e7a-a635-31a1f7725256)
 
 ### 3. Report Upload Page (`supa.html`)
-![Report Upload](path/to/report-upload-screenshot.png)
+
+![Screenshot 2025-03-14 204002](https://github.com/user-attachments/assets/4466173a-87cd-4740-a4e7-ec304d878d03)
 
 ### 4. Doctor Dashboard (`doctor.html`)
-![Doctor Dashboard](path/to/doctor-dashboard-screenshot.png)
+
+![Screenshot 2025-03-14 204052](https://github.com/user-attachments/assets/c1710f11-c2fb-4d01-a70f-cc794e27ae35)
+
 
 ### 5. Supabase Backend
-![Supabase Backend](path/to/supabase-backend-screenshot.png)
+
+![Screenshot 2025-03-14 204335](https://github.com/user-attachments/assets/939c66e7-d14e-483e-ae9f-d1e7cbb09acb)
+
+
 
 ## Security & Data Protection
 - **End-to-end encryption** to ensure the confidentiality of medical records.
