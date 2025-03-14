@@ -82,7 +82,9 @@ Med-E-Safe/
 Contributions are welcome! Feel free to fork this repository, create a new branch, and submit a pull request.
 
 ## License
-This project is licensed under the MIT License.
+
+https://github.com/user-attachments/assets/1b6f530c-0eb8-4c25-90c6-f26a9c64263a
+
 
 ## Contact
 For any queries or collaboration opportunities, reach out at **aliakbarkhana79@gmail.com**.
