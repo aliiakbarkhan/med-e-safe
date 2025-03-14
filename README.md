@@ -66,6 +66,11 @@ Med-E-Safe/
 
 ![Screenshot 2025-03-14 204335](https://github.com/user-attachments/assets/939c66e7-d14e-483e-ae9f-d1e7cbb09acb)
 
+## Database Information
+
+- Supabase/Database URL: https://dasbfurobvglciwqetyx.supabase.co
+- Bucket/Folder Name: files
+- Database/ANON Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhc2JmdXJvYnZnbGNpd3FldHl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE4NjI0NDUsImV4cCI6MjA1NzQzODQ0NX0.ESMHA5GCIRhF1Y8SSnmuXQ2bD1-A9g_i1K-Jo6p82Kw
 
 
 ## Security & Data Protection
