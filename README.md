@@ -86,11 +86,11 @@ Med-E-Safe/
 - Improve UI/UX for enhanced usability.
 
 ## Contributing
-Contributions are welcome! Feel free to fork this repository, create a new branch, and submit a pull request.
+Contributions are welcome! You can fix this repository, create a new branch, and submit a pull request.
 
 ## License
 
-https://github.com/user-attachments/assets/1b6f530c-0eb8-4c25-90c6-f26a9c64263a
+https://github.com/user-attachments/assets/af7a9530-cbef-4cb4-8f47-7d2a0691824d
 
 
 ## Contact
